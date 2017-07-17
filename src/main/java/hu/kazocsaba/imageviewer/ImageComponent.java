@@ -128,6 +128,10 @@ class ImageComponent extends JComponent {
 	public void setImage(BufferedImage newImage) {
 		BufferedImage oldImage = image;
 		image = newImage;
+
+		//need to resie the panel area
+		resizePanel();
+
 		paintManager.notifyChanged();
 		if (oldImage != newImage &&
 				(oldImage == null || newImage == null || oldImage.getWidth() != newImage.getWidth() ||
@@ -233,6 +237,26 @@ class ImageComponent extends JComponent {
 	public double getZoomFactor() {
 		return zoomFactor;
 	}
+
+
+	protected void resizePanel() {
+		if (zoomFactor<=1.0) {
+			this.viewer.getComponent().setPreferredSize(getPreferredSize());
+			this.viewer.getScrollPane().setPreferredSize(getPreferredSize());
+			//this.viewer.getScrollPane().getHorizontalScrollBar().setVisible(false);
+			this.viewer.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			this.viewer.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		}
+		else {
+			//back to image original size.
+			Dimension original = new Dimension(image.getWidth(), image.getHeight());
+			this.viewer.getComponent().setPreferredSize(original);
+			this.viewer.getScrollPane().setPreferredSize(original);
+			this.viewer.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			this.viewer.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		}
+	}
 	
 	/**
 	 * Sets the zoom factor to use when the resize strategy is CUSTOM_ZOOM.
@@ -251,26 +275,10 @@ class ImageComponent extends JComponent {
 		zoomFactor=newZoomFactor;
 		boolean canRescroll=viewer.getSynchronizer().zoomFactorChangedCanIRescroll(viewer);
 		if (getResizeStrategy()==ResizeStrategy.CUSTOM_ZOOM) {
+
 			//resize the panel shrink if needed
-			if (zoomFactor<=1.0) {
-				this.viewer.getComponent().setPreferredSize(getPreferredSize());
-				this.viewer.getScrollPane().setPreferredSize(getPreferredSize());
-				//this.viewer.getScrollPane().getHorizontalScrollBar().setVisible(false);
-				this.viewer.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-				this.viewer.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+			resizePanel();
 
-
-				canRescroll = false;
-			}
-			else {
-				//back to image original size.
-				Dimension original = new Dimension(image.getWidth(), image.getHeight());
-				this.viewer.getComponent().setPreferredSize(original);
-				this.viewer.getScrollPane().setPreferredSize(original);
-				this.viewer.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				this.viewer.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-			}
 			resizeNow();
 			// do not rescroll if we're following another viewer; the scrolling will be synchronized later
 			if (canRescroll) {
