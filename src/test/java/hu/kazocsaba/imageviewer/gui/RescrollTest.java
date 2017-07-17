@@ -23,21 +23,20 @@
  */
 package hu.kazocsaba.imageviewer.gui;
 
-import hu.kazocsaba.imageviewer.ImageViewer;
-import hu.kazocsaba.imageviewer.ResizeStrategy;
-import static hu.kazocsaba.imageviewer.gui.GuiUtils.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+
 import javax.swing.BoundedRangeModel;
 import javax.swing.JFrame;
 import javax.swing.JViewport;
+
 import org.fest.assertions.Assertions;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
@@ -48,6 +47,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import hu.kazocsaba.imageviewer.ImageViewer;
+import hu.kazocsaba.imageviewer.ResizeStrategy;
+
+import static hu.kazocsaba.imageviewer.gui.GuiUtils.scrollTo;
 
 /**
  * Tests that the viewer properly positions the viewport after an image resize.
@@ -155,10 +159,10 @@ public class RescrollTest {
 		return actualCenter;
 	}
 	private void resizeViewer(final ResizeStrategy strategy) {
-		resizeViewer(viewer, strategy);
+		GuiUtils.resizeViewer(viewer, strategy);
 	}
 	private void resizeViewer(final double zoomFactor) {
-		resizeViewer(viewer, zoomFactor);
+		GuiUtils.resizeViewer(viewer, zoomFactor);
 	}
 	
 	@Test

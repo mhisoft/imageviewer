@@ -2,6 +2,7 @@ package hu.kazocsaba.imageviewer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -67,7 +68,7 @@ public final class ImageViewer {
 	 */
 	public ImageViewer(BufferedImage image, boolean defaultPopupMenu) {
 		propertyChangeSupport=new PropertyChangeSupport(this);
-		panel=new JPanel(new BorderLayout());
+		panel=new JPanel(new FlowLayout());
 		scroller=new JScrollPane() {
 
 			@Override
@@ -99,7 +100,7 @@ public final class ImageViewer {
 		scroller.setViewportView(view.getComponent());
 		theImage.setImage(image);
 		
-		panel.add(scroller, BorderLayout.CENTER);
+		panel.add(scroller);
 		
 		setStatusBar(new DefaultStatusBar());
 		

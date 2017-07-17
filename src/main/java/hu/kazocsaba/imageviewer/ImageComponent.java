@@ -1,5 +1,7 @@
 package hu.kazocsaba.imageviewer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.applet.Applet;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -19,10 +21,10 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
@@ -63,6 +65,7 @@ class ImageComponent extends JComponent {
 				Dimension viewSize=viewer.getScrollPane().getViewport().getExtentSize();
 				getImageTransform().transform(preparedCenter, preparedCenter);
 				Rectangle view = new Rectangle((int)Math.round(preparedCenter.getX()-viewSize.width/2.0), (int)Math.round(preparedCenter.getY()-viewSize.height/2.0), viewSize.width, viewSize.height);
+				//Rectangle view = new Rectangle(0, 0, viewSize.width, viewSize.height);
 				preparedCenter=null;
 				scrollRectToVisible(view);
 			}
@@ -248,6 +251,26 @@ class ImageComponent extends JComponent {
 		zoomFactor=newZoomFactor;
 		boolean canRescroll=viewer.getSynchronizer().zoomFactorChangedCanIRescroll(viewer);
 		if (getResizeStrategy()==ResizeStrategy.CUSTOM_ZOOM) {
+			//resize the panel shrink if needed
+			if (zoomFactor<=1.0) {
+				this.viewer.getComponent().setPreferredSize(getPreferredSize());
+				this.viewer.getScrollPane().setPreferredSize(getPreferredSize());
+				//this.viewer.getScrollPane().getHorizontalScrollBar().setVisible(false);
+				this.viewer.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				this.viewer.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+
+				canRescroll = false;
+			}
+			else {
+				//back to image original size.
+				Dimension original = new Dimension(image.getWidth(), image.getHeight());
+				this.viewer.getComponent().setPreferredSize(original);
+				this.viewer.getScrollPane().setPreferredSize(original);
+				this.viewer.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				this.viewer.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+			}
 			resizeNow();
 			// do not rescroll if we're following another viewer; the scrolling will be synchronized later
 			if (canRescroll) {
