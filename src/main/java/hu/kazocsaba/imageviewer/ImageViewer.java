@@ -46,6 +46,9 @@ public final class ImageViewer {
 	private boolean statusBarVisible=false;
 	private PropertyChangeSupport propertyChangeSupport;
 	private Synchronizer synchronizer;
+	JPopupMenu popup ;
+
+
 
 	/**
 	 * Creates a new image viewer. Initially it will be empty, and it will have a default popup menu.
@@ -60,6 +63,11 @@ public final class ImageViewer {
 	public ImageViewer(BufferedImage image) {
 		this(image, true);
 	}
+
+	public JPopupMenu getPopupMenu() {
+		return popup;
+	}
+
 	/**
 	 * Creates a new image viewer displaying the specified image.
 	 * @param image the image to display; if <code>null</code> then no image is displayed
@@ -103,35 +111,47 @@ public final class ImageViewer {
 		panel.add(scroller);
 		
 		setStatusBar(new DefaultStatusBar());
+
+		popup = new DefaultViewerPopup(ImageViewer.this);
 		
 		if (defaultPopupMenu) {
-			theImage.addMouseListener(new MouseAdapter() {
-				JPopupMenu popup;
-				private void showPopup(MouseEvent e) {
-					e.consume();
-					if (popup==null) popup=new DefaultViewerPopup(ImageViewer.this);
-					Point p = panel.getPopupLocation(e);
-					if (p == null) {
-						p = e.getPoint();
-					}
-					popup.show(e.getComponent(), p.x, p.y);
-				}
-				@Override
-				public void mousePressed(MouseEvent e) {
-					if (e.isPopupTrigger()) {
-						showPopup(e);
-					}
-				}
-				@Override
-				public void mouseReleased(MouseEvent e) {
-					if (e.isPopupTrigger()) {
-						showPopup(e);
-					}
-				}
-			});
-
+			theImage.addMouseListener(new MyMouseAdapter(popup, panel) );
 		}
 	}
+
+
+	static class MyMouseAdapter extends MouseAdapter {
+		JPopupMenu popup;
+		private JPanel panel;
+
+		public MyMouseAdapter(JPopupMenu popup, JPanel panel) {
+			this.popup = popup;
+			this.panel = panel;
+		}
+
+		private void showPopup(MouseEvent e) {
+			e.consume();
+			//if (popup==null) popup=new DefaultViewerPopup(ImageViewer.this);
+			Point p = panel.getPopupLocation(e);
+			if (p == null) {
+				p = e.getPoint();
+			}
+			popup.show(e.getComponent(), p.x, p.y);
+		}
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				showPopup(e);
+			}
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				showPopup(e);
+			}
+		}
+	}
+
 	/**
 	 * Sets the status bar component for this image viewer. The new status bar is made
 	 * visible only if the statusBarVisible property is true. If <code>statusBar</code> is
