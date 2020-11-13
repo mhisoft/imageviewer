@@ -82,6 +82,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<source>7</source>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
